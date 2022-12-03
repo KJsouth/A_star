@@ -1,4 +1,4 @@
-#include"node.h"
+#include"node.hpp"
 #include<queue>
 using namespace std;
 const int mapsize = 24;//地图的尺寸
@@ -74,7 +74,10 @@ void listAppend(node* cur, vector<node*>& openlist, vector<node*>& closelist, ve
 			node* t = new node(i, target, cur);
 			node* t1 = nodeIn(t, openlist);//当前节点是否在openlist中
 			node* t2 = nodeIn(t, closelist);//当前节点是否在closelist中
+			//1.0 如果到达终点 退出
+			//2.0 如果是障碍物 跳过
 			if (tarmap[tx][ty] == 1 || t2) { continue; }//如果当前节点是阻碍物，就直接看下一个节点
+			//3.0 在openlist 中的话 更新g值
 			if (t1 && t1->gval > t->gval) {//如果当前节点的gval比openlist中的该节点小，
 			//这说明之前的路径走到的此节点不如当前的路径走到此节点的代价小，
 			//那么就更新当前的节点（非常重要的一个步骤）
@@ -85,44 +88,13 @@ void listAppend(node* cur, vector<node*>& openlist, vector<node*>& closelist, ve
 					}
 				}
 			}
+			//4.0 如果不在openlist  加入
 			if (!t1)//如果当前节点不在openlist中，就直接加入到openlist中
 				openlist.push_back(t);
 		}
 	}
 }
 
-
-//处理cur节点及其周围的8个节点
-void listAppend_new(node* cur, vector<node*>& openlist, vector<node*>& closelist, vector<vector<int>> tarmap) {
-	vector<pair<int, int>> points;
-	vector<pair<int, int>> temp = { { 0,1 },{ 1,0 },{ -1,0 },{ 0,-1 },{ 1,1 },{ -1,-1 },{ 1,-1 },{ -1,1 } };
-	for (auto i : temp) {
-		points.push_back({ cur->x + i.first,cur->y + i.second });
-	}
-	for (auto i : points) {//遍历这八个周围的节点
-		int tx = i.first, ty = i.second;
-		if (tx < mapsize && tx >= 0 && ty < mapsize && ty >= 0) {
-			node* t = new node(i, target, cur);
-			node* t1 = nodeIn(t, openlist);//当前节点是否在openlist中
-			node* t2 = nodeIn(t, closelist);//当前节点是否在closelist中
-			if (tarmap[tx][ty] == 1) { continue; }//如果当前节点是阻碍物，就直接看下一个节点
-
-			if(t2 && t2->gval > t->gval){//如果当前节点的gval比closelist中的该节点小，
-			//这说明之前的路径走到的此节点不如当前的路径走到此节点的代价小，
-			//那么就更新当前的节点（非常重要的一个步骤）
-				for (int i = 0; i < closelist.size(); i++) {
-					node*& temp = closelist[i];
-					if (temp->x == t2->x && temp->y == t2->y) {
-						temp = t; break;
-					}
-				}
-			}
-
-			if (!t1)//如果当前节点不在openlist中，就直接加入到openlist中
-				openlist.push_back(t);
-		}
-	}
-}
 void getres(node* res, vector<vector<int>>& tarmap) {//打印路径
 //从最终的节点来找到起点，通过res=res->father的方式
 	vector<pair<int, int>> reslist;
@@ -157,7 +129,7 @@ int main()
 	while (!openlist.empty())
 	{
 		node* temp = findMinF(openlist);
-		temp->show();//把当前节点的信息打印出来看看
+		// temp->show();//把当前节点的信息打印出来看看
 
 		if (temp->x == target.first && temp->y == target.second)
 		{
@@ -179,31 +151,6 @@ int main()
 		listAppend(temp, openlist, closelist, tarmap);//处理当前节点周围的八个节点
 	}
 	
-
-
-
-	//vector<node*> openlist;
-	//vector<node*> closelist;
-	//openlist.push_back(new node(start, target));//将起点放入openlist
-	//clock_t startTime, endTime;//计算一下找终点的过程所花的时间
-	//startTime = clock();
-	//while (openlist.size() != 0 && nodeIn(new node(target, target), closelist) == NULL) {
-	//	//当openlist不为空并且还没有在closelist中找到终点节点的时候一直循环
-	//	node* temp = findMinF(openlist);//找到当前openlist中的fval最小的值
-	//	temp->show();//把当前节点的信息打印出来看看
-	//	//在openlist中删除当前节点
-	//	int tsize = openlist.size();
-	//	for (int i = 0; i < tsize; i++) {
-	//		node* t = openlist[i];
-	//		if (t->x == temp->x && t->y == temp->y) {
-	//			openlist.erase(openlist.begin() + i); break;
-	//		}
-	//	}
-	//	//如果当前节点不在closelist中就加入进去
-	//	if (!nodeIn(temp, closelist))
-	//		closelist.push_back(temp);
-	//	listAppend(temp, openlist, closelist, tarmap);//处理当前节点周围的八个节点
-	//}
 	endTime = clock();
 	cout << "------------------------------------------" << endl;
 	cout << "The run time is: " << (double)(endTime - startTime) / CLOCKS_PER_SEC << "s" << endl;
@@ -214,10 +161,6 @@ int main()
 	else { getres(res, tarmap); }
 	return 0;
 }
-//  int main(){
-// 	test();
-//  }
-
 
 
 
