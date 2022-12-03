@@ -75,7 +75,7 @@ void listAppend(node* cur, vector<node*>& openlist, vector<node*>& closelist, ve
 			node* t1 = nodeIn(t, openlist);//当前节点是否在openlist中
 			node* t2 = nodeIn(t, closelist);//当前节点是否在closelist中
 			//1.0 如果到达终点 退出
-			//2.0 如果是障碍物 跳过
+			//2.0 如果是障碍物，或者在closelist中 跳过
 			if (tarmap[tx][ty] == 1 || t2) { continue; }//如果当前节点是阻碍物，就直接看下一个节点
 			//3.0 在openlist 中的话 更新g值
 			if (t1 && t1->gval > t->gval) {//如果当前节点的gval比openlist中的该节点小，
